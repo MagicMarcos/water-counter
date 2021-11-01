@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+let ObjectId = require('mongodb').ObjectID;
 module.exports = function (app, passport, db) {
 	// normal routes ===============================================================
 
@@ -8,36 +10,16 @@ module.exports = function (app, passport, db) {
 
 	// PROFILE SECTION =========================
 	app.get('/profile', isLoggedIn, function (req, res) {
+		let uId = ObjectId(req.session.passport.user);
 		db.collection('waterTracker')
-			.find()
+			.find({ id: uId })
 			.toArray((err, result) => {
 				if (err) return console.log(err);
 				res.render('profile.ejs', {
 					user: req.user,
-					messages: result,
-					// time: req.query.time,
-					// total: req.query.total
+					waterCount: result,
 				});
 			});
-	});
-
-	app.put('/upVote', (req, res) => {
-		db.collection('messages').findOneAndUpdate(
-			{ name: req.body.name, msg: req.body.msg },
-			{
-				$set: {
-					thumbUp: req.body.thumbUp + 1,
-				},
-			},
-			{
-				sort: { _id: -1 },
-				upsert: true,
-			},
-			(err, result) => {
-				if (err) return res.send(err);
-				res.send(result);
-			}
-		);
 	});
 
 	// LOGOUT ==============================
@@ -48,12 +30,14 @@ module.exports = function (app, passport, db) {
 
 	// message board routes ===============================================================
 
-	app.post('/messages', (req, res) => {
+	app.post('/waterCount', (req, res) => {
+		console.log(req.user._id);
 		db.collection('waterTracker').save(
 			{
 				time: req.body.time,
 				waterAmount: req.body.waterAmount,
 				date: req.body.date,
+				id: req.user._id,
 			},
 			(err, result) => {
 				if (err) return console.log(err);
@@ -63,39 +47,11 @@ module.exports = function (app, passport, db) {
 		);
 	});
 
-	// app.put('/upVote', (req, res) => {
-	//   db.collection('messages')
-	//   .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
-	//     $set: {
-	//       thumbUp:req.body.thumbUp + 1
-	//     }
-	//   }, {
-	//     sort: {_id: -1},
-	//     upsert: true
-	//   }, (err, result) => {
-	//     if (err) return res.send(err)
-	//     res.send(result)
-	//   })
-	// })
-
-	// app.put('/downVote', (req, res) => {
-	//   db.collection('messages')
-	//   .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
-	//     $set: {
-	//       thumbUp:req.body.thumbDown - 1
-	//     }
-	//   }, {
-	//     sort: {_id: -1},
-	//     upsert: true
-	//   }, (err, result) => {
-	//     if (err) return res.send(err)
-	//     res.send(result)
-	//   })
-	// })
-
-	app.delete('/messages', (req, res) => {
+	app.delete('/delete', (req, res) => {
+		console.log(req.body.id);
+		console.log(req.body.id);
 		db.collection('waterTracker').findOneAndDelete(
-			{ time: req.body.time, waterAmount: req.body.waterAmount },
+			{ _id: new mongoose.mongo.ObjectID(req.body.deleteId) },
 			(err, result) => {
 				if (err) return res.send(500, err);
 				res.send({ result: 'Message deleted!' });

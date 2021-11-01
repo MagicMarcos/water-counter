@@ -16,15 +16,15 @@ Array.from(trash).forEach(function (element) {
 		const time = this.parentNode.parentNode.childNodes[1].innerText;
 		const waterAmount = this.parentNode.parentNode.childNodes[3].innerText;
 		console.log('hi', typeof time, typeof waterAmount);
+		const deleted = element.value;
 
-		fetch('messages', {
+		fetch('delete', {
 			method: 'delete',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				time: time,
-				waterAmount: waterAmount,
+				deleteId: deleted,
 			}),
 		})
 			.then(function (response) {
