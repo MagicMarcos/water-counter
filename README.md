@@ -1,5 +1,5 @@
 # Daily Water Tracker
-<p> As the name hints at (not so subtly) this is a simple app to track your daily water intake in cups.</p>
+<p> As the name hints at (not so subtly) this is a simple app to track your daily water intake measured in cups.</p>
 
 <h1>How It's Made:</h1>
 <p>Utilized: </p> 
